@@ -1,0 +1,16 @@
+E:\workspace\Mongo\Mongo\MonGo\bin\Debug\netcoreapp2.2\MonGo.deps.json
+E:\workspace\Mongo\Mongo\MonGo\bin\Debug\netcoreapp2.2\MonGo.runtimeconfig.json
+E:\workspace\Mongo\Mongo\MonGo\bin\Debug\netcoreapp2.2\MonGo.runtimeconfig.dev.json
+E:\workspace\Mongo\Mongo\MonGo\bin\Debug\netcoreapp2.2\MonGo.dll
+E:\workspace\Mongo\Mongo\MonGo\obj\Debug\netcoreapp2.2\MonGo.csprojAssemblyReference.cache
+E:\workspace\Mongo\Mongo\MonGo\obj\Debug\netcoreapp2.2\MonGo.csproj.CoreCompileInputs.cache
+E:\workspace\Mongo\Mongo\MonGo\obj\Debug\netcoreapp2.2\MonGo.AssemblyInfoInputs.cache
+E:\workspace\Mongo\Mongo\MonGo\obj\Debug\netcoreapp2.2\MonGo.AssemblyInfo.cs
+E:\workspace\Mongo\Mongo\MonGo\bin\Debug\netcoreapp2.2\MonGo.pdb
+E:\workspace\Mongo\Mongo\MonGo\obj\Debug\netcoreapp2.2\MonGo.dll
+E:\workspace\Mongo\Mongo\MonGo\obj\Debug\netcoreapp2.2\MonGo.pdb
+E:\workspace\Mongo\Mongo\MonGo\obj\Debug\netcoreapp2.2\MonGo.RazorAssemblyInfo.cache
+E:\workspace\Mongo\Mongo\MonGo\obj\Debug\netcoreapp2.2\MonGo.RazorAssemblyInfo.cs
+E:\workspace\Mongo\Mongo\MonGo\obj\Debug\netcoreapp2.2\MonGo.RazorTargetAssemblyInfo.cache
+E:\workspace\Mongo\Mongo\MonGo\bin\Debug\netcoreapp2.2\MonGo.Views.dll
+E:\workspace\Mongo\Mongo\MonGo\obj\Debug\netcoreapp2.2\MonGo.csproj.CopyComplete
