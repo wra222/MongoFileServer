@@ -20,6 +20,11 @@ namespace MonGo.Controllers
             _fileService = fileService;
             _hostingEnvironment = hostingEnvironment;
         }
+        /// <summary>
+        /// 普通文件获取
+        /// </summary>
+        /// <param name="id">文件id</param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
@@ -38,11 +43,17 @@ namespace MonGo.Controllers
             var response = File(imgByte, FileType);
             return response;
         }
-       
+       /// <summary>
+       /// 缩略图获取
+       /// </summary>
+       /// <param name="Thumb">缩略图参数</param>
+       /// <param name="id">文件id</param>
+       /// <returns></returns>
         [HttpGet("{Thumb}/{id}", Name = "GetThumb")]
         public IActionResult Get(string Thumb, string id)
         {
             //thumb_650_300
+            LogHelper.Info($"{System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.FullName} - {DateTime.Now} 获取文件:id={id}"); // 日志记录
             string[] Thumbs = Thumb.Split('_');
             IActionResult response;
             ImageHelper Ihelper = new ImageHelper();
@@ -101,22 +112,27 @@ namespace MonGo.Controllers
             }
  
         }
+        /// <summary>
+        /// 文件上传，通过form 上传文件
+        /// </summary>
+        /// <returns></returns>
         [Route("uploadFile")]
         [HttpPost(Name = "uploadFile")]
+        
         public ApiResponse uploadFile()
         {
             Console.WriteLine("Uploading...");
-            string State = string.Empty;
-    
+            string State = "success";
+            string FileType;
             var files = Request.Form.Files;
-            string FileType = string.Empty;
+             
             string FileId = string.Empty;
             Content content = new Content();
             ImageHelper Ihelper = new ImageHelper();
             List<Content> list = new List<Content>();
             try
             {
-                State = "success";
+                
                 foreach (var file in files)
                 {
                     var fileName = file.FileName;
@@ -128,6 +144,7 @@ namespace MonGo.Controllers
                         file.CopyTo(ms);
                         //fs.Flush();
                         ms.Position = 0;
+                        //通过MD5检验文件是否在库，
                         var md5 = MD5Helper.GetMD5Hash(ms);
                         FileId = _fileService.CheckFileExistsByMd5(md5);
                         if (string.IsNullOrEmpty(FileId))

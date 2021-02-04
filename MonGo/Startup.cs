@@ -5,15 +5,25 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MonGo.Services;
+using log4net;
+using log4net.Config;
 using System;
+using MonGo.Entity;
+using System.IO;
+using log4net.Repository;
 
 namespace MonGo
 {
     public class Startup
     {
+        public static ILoggerRepository repository { get; set; }
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            
+            repository = LogManager.CreateRepository("CoreLogRepository");
+            XmlConfigurator.Configure(repository, new FileInfo("config/log4net.config"));
+            Log4NetRepository.loggerRepository = repository;
         }
 
         public IConfiguration Configuration { get; }
@@ -57,6 +67,15 @@ namespace MonGo
           
             //app.UseHttpsRedirection();
             app.UseMvc();
+            //ServiceEntity serviceEntity = new ServiceEntity
+            //{
+            //    IP = NetworkHelper.LocalIPAddress,
+            //    Port = Convert.ToInt32(Configuration["Service:Port"]),
+            //    ServiceName = Configuration["Service:Name"],
+            //    ConsulIP = Configuration["Consul:IP"],
+            //    ConsulPort = Convert.ToInt32(Configuration["Consul:Port"])
+            //};
+            //app.RegisterConsul(lifetime, serviceEntity);
         }
     }
 }
