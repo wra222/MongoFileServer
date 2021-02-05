@@ -3,3 +3,5 @@
 ################################################################################
 
 /.vs
+/MonGo/bin/Debug/netcoreapp3.1
+/MonGo/obj/Debug/netcoreapp3.1

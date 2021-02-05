@@ -11,11 +11,12 @@ namespace MonGo.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+
     public class FileController : ControllerBase
     {
         private readonly FileService _fileService;
-        private readonly IHostingEnvironment _hostingEnvironment;
-        public FileController(FileService fileService, IHostingEnvironment hostingEnvironment)
+        private readonly IWebHostEnvironment _hostingEnvironment;
+        public FileController(FileService fileService, IWebHostEnvironment hostingEnvironment)
         {
             _fileService = fileService;
             _hostingEnvironment = hostingEnvironment;
@@ -28,20 +29,28 @@ namespace MonGo.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
-            string[] files = id.Split('.');
-            if (files.Length < 2)
+            try
             {
+                string[] files = id.Split('.');
+                if (files.Length < 2)
+                {
+                    return NotFound();
+                }
+                ImageHelper Ihelper = new ImageHelper();
+                var imgByte = _fileService.DownloadToByte(ObjectId.Parse(files[0]));
+                string FileType = Ihelper.GetImageType(files[files.Length - 1]);
+                if (imgByte == null)
+                {
+                    return NotFound();
+                }
+                var response = File(imgByte, FileType);
+                return response;
+            }
+            catch(Exception ex)
+            {
+                LogHelper.Error($"{System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.FullName} - {DateTime.Now} 获取文件:id={id}",ex); // 日志记录
                 return NotFound();
             }
-            ImageHelper Ihelper = new ImageHelper();
-            var imgByte = _fileService.DownloadToByte(ObjectId.Parse(files[0]));
-            string FileType = Ihelper.GetImageType(files[files.Length - 1]);
-            if (imgByte == null)
-            {
-                return NotFound();
-            }
-            var response = File(imgByte, FileType);
-            return response;
         }
        /// <summary>
        /// 缩略图获取
@@ -121,59 +130,67 @@ namespace MonGo.Controllers
         
         public ApiResponse uploadFile()
         {
-            Console.WriteLine("Uploading...");
             string State = "success";
-            string FileType;
-            var files = Request.Form.Files;
-             
-            string FileId = string.Empty;
-            Content content = new Content();
-            ImageHelper Ihelper = new ImageHelper();
-            List<Content> list = new List<Content>();
             try
             {
-                
-                foreach (var file in files)
+                Console.WriteLine("Uploading...");
+                string FileType;
+                var files = Request.Form.Files;
+
+                string FileId = string.Empty;
+                Content content = new Content();
+                ImageHelper Ihelper = new ImageHelper();
+                List<Content> list = new List<Content>();
+                try
                 {
-                    var fileName = file.FileName;
-                    string[] fileType = fileName.Split('.');
-                    FileType = Ihelper.GetImageType(fileType[fileType.Length - 1]);
-                    //fileName = Path.Combine(_hostingEnvironment.WebRootPath + $"/UploadFile/", fileName);
-                    using (MemoryStream ms = new MemoryStream())
+
+                    foreach (var file in files)
                     {
-                        file.CopyTo(ms);
-                        //fs.Flush();
-                        ms.Position = 0;
-                        //通过MD5检验文件是否在库，
-                        var md5 = MD5Helper.GetMD5Hash(ms);
-                        FileId = _fileService.CheckFileExistsByMd5(md5);
-                        if (string.IsNullOrEmpty(FileId))
+                        var fileName = file.FileName;
+                        string[] fileType = fileName.Split('.');
+                        FileType = Ihelper.GetImageType(fileType[fileType.Length - 1]);
+                        //fileName = Path.Combine(_hostingEnvironment.WebRootPath + $"/UploadFile/", fileName);
+                        using (MemoryStream ms = new MemoryStream())
                         {
-                            FileId += _fileService.UploadFromStream(ms, file.FileName, FileType);
+                            file.CopyTo(ms);
+                            //fs.Flush();
+                            ms.Position = 0;
+                            //通过MD5检验文件是否在库，
+                            var md5 = MD5Helper.GetMD5Hash(ms);
+                            FileId = _fileService.CheckFileExistsByMd5(md5);
+                            if (string.IsNullOrEmpty(FileId))
+                            {
+                                FileId += _fileService.UploadFromStream(ms, file.FileName, FileType);
+                            }
+                            content.Id = FileId;
+                            content.Hash = md5;
+                            content.FileName = file.FileName;
+                            content.ContentType = FileType;
+                            list.Add(content);
                         }
+                        //filenames+= _fileService.UploadFromFile(fileName, file.FileName);
+                    }
+                    return new ApiResponse() {  State = State,Content = list };
+                }
+                catch(Exception ex)
+                {
+                    State = "fail";
+                    foreach (var file in files)
+                    {
                         content.Id = FileId;
-                        content.Hash = md5;
+                        string[] fileType = file.FileName.Split('.');
+                        FileType = Ihelper.GetImageType(fileType[fileType.Length - 1]);
                         content.FileName = file.FileName;
                         content.ContentType = FileType;
-                        list.Add(content);
                     }
-                    //filenames+= _fileService.UploadFromFile(fileName, file.FileName);
+                    list.Add(content);
+                    return new ApiResponse() { State = State, Content = list };
                 }
-                return new ApiResponse() { Content = list, State = State };
             }
             catch
             {
                 State = "fail";
-                foreach (var file in files)
-                {
-                    content.Id = FileId;
-                    string[] fileType = file.FileName.Split('.');
-                    FileType = Ihelper.GetImageType(fileType[fileType.Length - 1]);
-                    content.FileName = file.FileName;
-                    content.ContentType = FileType;
-                }
-                list.Add(content);
-                return new ApiResponse() { State = State, Content = list };
+                return new ApiResponse() { State = State, Content = null };
             }
         }
     }

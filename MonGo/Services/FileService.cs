@@ -13,20 +13,18 @@ namespace MonGo.Services
 {
     public class FileService
     {
-        //private readonly IMongoCollection<Book> _books;
-        //private readonly IMongoDatabase _MonDb;
         private readonly IMongoClient client;
         private readonly IMongoDatabase database;
         //private readonly IMongoCollection<BsonDocument> collection;
         private readonly IMongoCollection<UrlCache> _UrlCache;
         private  GridFSBucket bucket;
         private GridFSFileInfo fileInfo;
-        private ObjectId oid;
+        //private ObjectId oid;
         private GridFSBucketOptions option;
         public FileService(IConfiguration config)
         {
-             client = new MongoClient(config.GetConnectionString("BookstoreDb"));
-            database = client.GetDatabase("BookstoreDb");
+            client = new MongoClient(config.GetConnectionString("FilesServerDb"));
+            database = client.GetDatabase(config.GetConnectionString("DataBaseName"));
             _UrlCache = database.GetCollection<UrlCache>("UrlCache");
         }
         public string UploadFromFile(string FilePath, string FileName, GridFSUploadOptions Options = null)

@@ -11,6 +11,7 @@ using System;
 using MonGo.Entity;
 using System.IO;
 using log4net.Repository;
+using Microsoft.Extensions.Hosting;
 
 namespace MonGo
 {
@@ -31,13 +32,13 @@ namespace MonGo
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddHsts(options =>
             {
                 options.Preload = true;
                 options.IncludeSubDomains = true;
                 options.MaxAge = TimeSpan.FromDays(60);
-                options.ExcludedHosts.Add("192.168.8.6");
+                //options.ExcludedHosts.Add("192.168.8.6");
                 //options.ExcludedHosts.Add("www.example.com");
             });
             services.AddHttpsRedirection(options =>
@@ -49,10 +50,12 @@ namespace MonGo
             //services.AddScoped<BookService>();
             services.AddScoped<FileService>();
             services.AddCors();
+            services.AddMvc(options => { options.EnableEndpointRouting = false; });
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -63,10 +66,19 @@ namespace MonGo
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-             
-          
+
             //app.UseHttpsRedirection();
-            app.UseMvc();
+            app.UseStaticFiles();
+
+            app.UseRouting();
+            //app.UseHttpsRedirection();
+            
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "Default",
+                    template: "{controller=Files}/{action=Index}/{id?}");
+            });
             //ServiceEntity serviceEntity = new ServiceEntity
             //{
             //    IP = NetworkHelper.LocalIPAddress,
